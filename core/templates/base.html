@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+        content="Бал нежити — анонимное голосование за хеллоуинские костюмы. Выбери лучших из лучших!">
+    <meta name="theme-color" content="#0C0716">
+    <title>{% block title %}Бал нежити — голосование за костюмы 🎃{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+    <!-- Google Fonts с font-display:swap; при отсутствии сети сайт остаётся
+       читаемым на системных фолбэках ('Arial Black'/'Segoe UI') — 03-Айдентика §5 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rubik+Wet+Paint&family=Manrope:wght@400;600;800&family=Caveat:wght@600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Перейти к голосованию</a>
+
+    <header class="site-header">
+        <a class="brand" href="/" aria-label="Бал нежити — на главную">
+            <svg class="brand-logo" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                <defs>
+                    <radialGradient id="pumpkinG" cx="35%" cy="30%" r="85%">
+                        <stop offset="0" stop-color="#FF9E4A" />
+                        <stop offset="1" stop-color="#FF7518" />
+                    </radialGradient>
+                </defs>
+                <path d="M31 12c-1.5-6 1.5-10.5 7-11.5-1.5 3-2 5.5-2 8 0 2 .3 3.2 1 4.3z" fill="#4ADE80" />
+                <ellipse cx="32" cy="17" rx="11" ry="4.5" fill="#FF9E4A" />
+                <ellipse cx="32" cy="38" rx="13" ry="19" fill="url(#pumpkinG)" />
+                <ellipse cx="19" cy="40" rx="9" ry="15" fill="url(#pumpkinG)" opacity=".85" />
+                <ellipse cx="45" cy="40" rx="9" ry="15" fill="url(#pumpkinG)" opacity=".85" />
+                <path d="M25 33l6.5 4-6.5 4z" fill="#0C0716" />
+                <path d="M39 33l-6.5 4 6.5 4z" fill="#0C0716" />
+                <path d="M24 45c3 4.5 13 4.5 16 0l-2.5 6-5.5 3.2-5.5-3.2z" fill="#0C0716" />
+            </svg>
+            <span class="brand-name">БАЛ НЕЖИТИ</span>
+        </a>
+        <!-- бейдж состояния статус-машины (на гостевой странице обновляет vote.js) -->
+        {% block badge %}<span id="state-badge" class="state-badge" role="status">…</span>{% endblock %}
+    </header>
+
+    {% block progress %}
+    <!-- прогресс: 5 тыкв, текущая пульсирует (виден только на шагах) -->
+    <nav id="progress" class="progress" aria-label="Прогресс: шаг 1 из 5" hidden>
+        <span class="pumpkin" aria-hidden="true">🎃</span>
+        <span class="pumpkin" aria-hidden="true">🎃</span>
+        <span class="pumpkin" aria-hidden="true">🎃</span>
+        <span class="pumpkin" aria-hidden="true">🎃</span>
+        <span class="pumpkin" aria-hidden="true">🎃</span>
+    </nav>
+    {% endblock %}
+
+    <main id="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <span class="footer-slogan">Голосуй, пока не рассвело 🦇</span>
+        <span class="footer-meta">Бал нежити · Halloween · 07.11.2026 · tykvogolos.example</span>
+    </footer>
+
+    <noscript>
+        <p class="noscript">Для голосования нужен JavaScript — включите его в настройках браузера 🕯️</p>
+    </noscript>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

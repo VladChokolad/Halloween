@@ -1,0 +1,43 @@
+{% extends "panel/base_admin.html" %}
+
+{% block title %}Тыквоголос — группа{% endblock %}
+
+{% block content %}
+<h2 class="section">
+    {% if object %}Изменить группу №{{ object.number }}{% else %}Новая группа{% endif %}
+</h2>
+
+{% if form.errors %}
+<ul class="form-errors">
+    {% for field, errors in form.errors.items %}
+    {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+    {% endfor %}
+</ul>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="admin-form">
+    {% csrf_token %}
+    <label for="{{ form.number.id_for_label }}">Номер</label>
+    {{ form.number }}
+    <label for="{{ form.name.id_for_label }}">Название</label>
+    {{ form.name }}
+    <label for="{{ form.description.id_for_label }}">Описание</label>
+    {{ form.description }}
+
+    <label for="{{ form.participants.id_for_label }}">Состав</label>
+    {{ form.participants }}
+    <p class="form-help">{{ form.participants.help_text }}</p>
+
+    <label for="{{ form.photo.id_for_label }}">Фото</label>
+    {{ form.photo }}
+    {% if object.photo_data %}
+    <p class="form-help">Текущее фото:</p>
+    <img class="photo-preview" src="/photo/g/{{ object.pk }}.jpg" alt="Фото {{ object.name }}">
+    {% endif %}
+
+    <p class="mt">
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a class="btn" href="{% url 'admin_groups' %}">Отмена</a>
+    </p>
+</form>
+{% endblock %}

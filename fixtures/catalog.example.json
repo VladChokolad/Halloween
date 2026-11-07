@@ -1,0 +1,76 @@
+{
+    "_comment": "«Золотая копия» справочников «Тыквоголос» (04 §8.4). Перенос между планами A/B/C: source — мок-данные прототипа, имена — wireframes ТЗ §7. Категории — константы кода: SCARY, FUNNY, ORIGINAL, GROUP, GRANDPRIX.",
+    "participants": [
+        {
+            "number": 1,
+            "name": "Вдова Мортис",
+            "description": "Плакала над рассадой",
+            "is_active": true
+        },
+        {
+            "number": 2,
+            "name": "Скелет в отпуске",
+            "description": "Загар прямо на костях",
+            "is_active": true
+        },
+        {
+            "number": 3,
+            "name": "Кощей",
+            "description": "Смерть — на конце иглы",
+            "is_active": true
+        },
+        {
+            "number": 4,
+            "name": "Призрак офисного планктона",
+            "description": "Дедлайн вечен",
+            "is_active": true
+        },
+        {
+            "number": 5,
+            "name": "Летучая мышь-бариста",
+            "description": "Кофе строго после полуночи",
+            "is_active": true
+        },
+        {
+            "number": 6,
+            "name": "Зомби-фитнес",
+            "description": "Кардио до расспада",
+            "is_active": true
+        },
+        {
+            "number": 7,
+            "name": "Тыква-босс",
+            "description": "Праведный гнев грядки",
+            "is_active": true
+        },
+        {
+            "number": 8,
+            "name": "Инкогнито-призрак",
+            "description": "Простыня с дыркой",
+            "is_active": true
+        }
+    ],
+    "groups": [
+        {
+            "number": 1,
+            "name": "Семейка Аддамс",
+            "description": "Роднее некуда",
+            "is_active": true,
+            "participants": []
+        },
+        {
+            "number": 2,
+            "name": "Кладбищенский хор",
+            "description": "Поют в терцию",
+            "is_active": true,
+            "participants": []
+        }
+    ],
+    "state": {
+        "state": "NOT_STARTED",
+        "publish_results": false,
+        "allow_skip": true,
+        "grandprix_includes_groups": true,
+        "soft_ip_limit": 0
+    }
+}

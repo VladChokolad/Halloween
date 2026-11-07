@@ -1,0 +1,22 @@
+# --- secrets and env --- 
+.env 
+ 
+# --- local data and artifacts --- 
+data/ 
+staticfiles/ 
+backups/ 
+*.dump 
+*.sqlite3 
+ 
+# --- Python --- 
+.venv/ 
+venv/ 
+__pycache__/ 
+*.py[cod] 
+ 
+# --- tests and reports --- 
+.coverage 
+htmlcov/ 
+ 
+# --- misc --- 
+.DS_Store

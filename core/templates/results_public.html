@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Бал нежити — результаты вечера 🏆{% endblock %}
+{% block badge %}<span id="state-badge" class="state-badge st-finished" role="status">Завершено</span>{% endblock %}
+
+{% block content %}
+<div class="results-head">
+    <h1 class="hero">Итоги вечера 🏆</h1>
+    <p class="results-sub">Публичные результаты · только сводные данные, без деталей по голосующим</p>
+    {% if voters_total %}<p class="results-sub">Проголосовавших: <strong>{{ voters_total }}</strong></p>{% endif %}
+</div>
+
+<div id="results-root">
+    {% for section in sections %}
+    <section class="result-cat" style="--cat-color: {{ section.color }}">
+        <h2>{{ section.name }}</h2>
+        {% if section.empty %}
+        <p class="rip">R.I.P. — голосов пока нет 🪦</p>
+        {% else %}
+        <ol class="result-list">
+            {% for row in section.rows %}
+            <li class="result-row">
+                <span class="place" aria-hidden="true">{{ row.medal }}</span>
+                <span class="r-name">№{{ row.number }} {{ row.name }}
+                    <span class="visually-hidden">— {{ row.place }} место</span></span>
+                <span class="bar" role="img" aria-label="Голосов: {{ row.votes }}">
+                    <span class="bar-fill" style="--w: {{ row.width }}%"></span>
+                    <span class="bar-val">{{ row.votes }}</span>
+                </span>
+            </li>
+            {% endfor %}
+        </ol>
+        {% endif %}
+    </section>
+    {% endfor %}
+</div>
+
+<p class="results-sub" style="text-align:center;">
+    <a href="/" style="color: var(--accent);">← К голосованию</a>
+</p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /* анимация баров: ширина 0 → значение (при reduced-motion CSS мгновенно) */
+    (function () {
+        'use strict';
+        var root = document.getElementById('results-root');
+        if (!root) return;
+        window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
+                root.querySelectorAll('.bar-fill').forEach(function (el) {
+                    var w = el.style.getPropertyValue('--w');
+                    el.style.setProperty('--w', '0%');
+                    void el.offsetWidth;
+                    el.style.setProperty('--w', w);
+                });
+            });
+        });
+    })();
+</script>
+{% endblock %}

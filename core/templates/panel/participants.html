@@ -1,0 +1,62 @@
+{% extends "panel/base_admin.html" %}
+
+{% block title %}Тыквоголос — участники{% endblock %}
+
+{% block content %}
+<h2 class="section">Участники 🧛</h2>
+
+<p>
+    <a class="btn btn-primary" href="{% url 'admin_participant_new' %}">+ Добавить участника</a>
+    {% if show_archive %}
+    <a class="btn" href="{% url 'admin_participants' %}">Показать активных</a>
+    {% else %}
+    <a class="btn" href="{% url 'admin_participants' %}?filter=archive">Архив (снятые)</a>
+    {% endif %}
+</p>
+
+<form method="get" class="mt">
+    <input type="text" name="q" value="{{ search }}" placeholder="Поиск по имени…">
+    <button type="submit" class="btn btn-sm">Найти</button>
+</form>
+
+<table class="admin-table">
+    <tr>
+        <th>№</th>
+        <th>Имя</th>
+        <th>Описание</th>
+        <th>Фото</th>
+        <th>Голоса</th>
+        <th>Действия</th>
+    </tr>
+    {% for row in rows %}
+    {% with p=row.p %}
+    <tr class="{% if not p.is_active %}inactive{% endif %}">
+        <td>{{ p.number }}</td>
+        <td>{{ p.name }}{% if not p.is_active %} <span class="tag-archived">(снято)</span>{% endif %}</td>
+        <td>{{ p.description }}</td>
+        <td>{% if p.photo_data %}✓{% else %}—{% endif %}</td>
+        <td>{{ row.votes }}</td>
+        <td>
+            <a class="btn btn-sm" href="{% url 'admin_participant_edit' p.pk %}">Изменить</a>
+            {% if p.is_active %}
+            <button type="button" class="btn btn-sm btn-danger" id="trigger-del-{{ p.pk }}">Снять</button>
+            {% else %}
+            <form method="post" action="{% url 'admin_participant_restore' p.pk %}" style="display:inline;">{% csrf_token %}
+                <button type="submit" class="btn btn-sm">Восстановить</button>
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    {# include строго в одну строку: лексер Django не распознаёт многострочные теги #}
+    {% if p.is_active %}
+    {% include "panel/confirm_modal.html" with modal_id=row.modal_id trigger_id=row.trigger_id form_action=row.delete_url modal_title=row.delete_title phrase="СНЯТЬ" consequences=row.consequences submit_label="Снять (архив)" %}
+    {% endif %}
+    {% endwith %}
+    {% empty %}
+    <tr>
+        <td colspan="6" class="muted">Пока никого — добавьте участников.</td>
+    </tr>
+    {% endfor %}
+</table>
+<p class="muted">Мягкое удаление: участник помечается «(снято)», но голоса остаются в итогах (E2).</p>
+{% endblock %}

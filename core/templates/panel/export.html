@@ -1,0 +1,22 @@
+{% extends "panel/base_admin.html" %}
+
+{% block title %}Тыквоголос — экспорт{% endblock %}
+
+{% block content %}
+<h2 class="section">Экспорт 📦</h2>
+<p class="muted">CSV — UTF-8 с BOM: Excel откроет кириллицу без кракозябр (ТЗ §11).</p>
+<table class="admin-table">
+    <tr>
+        <th>Файл</th>
+        <th>Содержимое</th>
+        <th></th>
+    </tr>
+    {% for f in files %}
+    <tr>
+        <td><code>{{ f.label }}</code></td>
+        <td>{{ f.what }}</td>
+        <td><a class="btn btn-sm" href="{% url 'admin_export' f.name %}">Скачать</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

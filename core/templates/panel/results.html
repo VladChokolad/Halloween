@@ -1,0 +1,49 @@
+{% extends "panel/base_admin.html" %}
+{% load static %}
+
+{% block title %}Тыквоголос — результаты{% endblock %}
+
+{% block content %}
+<h2 class="section">Результаты 🏆</h2>
+<p class="muted">
+    Проголосовавших: <strong>{{ voters_total }}</strong> ·
+    Состояние: {{ state.state }} ·
+    {% if state.state == "FINISHED" %}
+    Публикация:
+<form method="post" action="{% url 'admin_toggle_publish' %}" style="display:inline;">{% csrf_token %}
+    <button type="submit" class="btn btn-sm {% if state.publish_results %}btn-danger{% endif %}">
+        {% if state.publish_results %}Снять публикацию{% else %}Опубликовать результаты{% endif %}
+    </button>
+</form>
+{% else %}
+переключатель публикации доступен только при FINISHED (E10)
+{% endif %}
+</p>
+
+{% for section in sections %}
+<div class="result-section" style="--sec-color: {{ section.color }};">
+    <h3>{{ section.name }}
+        <a class="btn btn-sm" href="{% url 'admin_chart' section.id|lower %}"
+            title="Полноэкранный режим (проектор)">⛶</a>
+    </h3>
+    {% if section.empty %}
+    <p class="muted">R.I.P. — голосов нет 🪦</p>
+    {% else %}
+    {% for row in section.rows %}
+    <div class="bar-row">
+        <span>{{ row.place }}. №{{ row.number }}</span>
+        <span class="bar-track"><span class="bar-fill2"
+                style="width: {% widthratio row.votes section.max_votes 100 %}%;"></span></span>
+        <span>{{ row.votes }} ({{ row.pct }}%)</span>
+    </div>
+    <div class="muted" style="grid-column: 2 / 4; margin-top: -4px;">{{ row.name }}</div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+{% if chartjs %}
+<script src="{% static 'vendor/chart.umd.min.js' %}"></script>{% endif %}
+{% endblock %}

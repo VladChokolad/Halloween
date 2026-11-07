@@ -1,0 +1,60 @@
+{% extends "panel/base_admin.html" %}
+
+{% block title %}Тыквоголос — участник{% endblock %}
+
+{% block content %}
+<h2 class="section">
+    {% if object %}Изменить участника №{{ object.number }} 🧛{% else %}Новый участник 🧛{% endif %}
+</h2>
+
+{% if has_votes %}
+<p class="form-errors">
+    ⚠️ У этого участника есть голоса. При «снятии» он пропадёт из карточек,
+    но голоса останутся в итогах с пометкой «(снято)» (E2).
+</p>
+{% endif %}
+
+{% if form.errors %}
+<ul class="form-errors">
+    {% for field, errors in form.errors.items %}
+    {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+    {% endfor %}
+</ul>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="admin-form">
+    {% csrf_token %}
+    <label for="{{ form.number.id_for_label }}">Номер (порядок карточек)</label>
+    {{ form.number }}
+    <label for="{{ form.name.id_for_label }}">Имя</label>
+    {{ form.name }}
+    <label for="{{ form.description.id_for_label }}">Описание</label>
+    {{ form.description }}
+
+    <label for="{{ form.photo.id_for_label }}">Фото</label>
+    {{ form.photo }}
+    <p class="form-help">{{ form.photo.help_text }}</p>
+    {% if object.photo_data %}
+    <p class="form-help">Текущее фото (гость видит так):</p>
+    <img class="photo-preview" src="/photo/p/{{ object.pk }}.jpg" alt="Фото {{ object.name }}">
+    {% endif %}
+
+    <p class="mt">
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a class="btn" href="{% url 'admin_participants' %}">Отмена</a>
+    </p>
+</form>
+
+{% if object %}
+<h3>Предпросмотр «глазами гостя» 👻</h3>
+<div
+    style="max-width: 280px; border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: var(--bg-soft);">
+    <div
+        style="width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 10px; background: #241a3d;">
+        <img src="/photo/p/{{ object.pk }}.jpg" alt="" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+    </div>
+    <div style="margin-top: 8px; font-weight: 800;">№{{ object.number }} {{ object.name }}</div>
+    {% if object.description %}<div class="muted">{{ object.description }}</div>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

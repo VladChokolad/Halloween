@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Тыквоголос — логотип «Тыква-урна»">
+  <defs>
+    <radialGradient id="pumpkinG" cx="35%" cy="30%" r="85%">
+      <stop offset="0" stop-color="#FF9E4A"/>
+      <stop offset="1" stop-color="#FF7518"/>
+    </radialGradient>
+  </defs>
+  <!-- черенок (ручка урны) -->
+  <path d="M31 12c-1.5-6 1.5-10.5 7-11.5-1.5 3-2 5.5-2 8 0 2 .3 3.2 1 4.3z" fill="#4ADE80"/>
+  <!-- крышка урны -->
+  <ellipse cx="32" cy="17" rx="11" ry="4.5" fill="#FF9E4A"/>
+  <!-- корпус-тыква -->
+  <ellipse cx="32" cy="38" rx="13" ry="19" fill="url(#pumpkinG)"/>
+  <ellipse cx="19" cy="40" rx="9" ry="15" fill="url(#pumpkinG)" opacity=".85"/>
+  <ellipse cx="45" cy="40" rx="9" ry="15" fill="url(#pumpkinG)" opacity=".85"/>
+  <!-- глаза -->
+  <path d="M25 33l6.5 4-6.5 4z" fill="#0C0716"/>
+  <path d="M39 33l-6.5 4 6.5 4z" fill="#0C0716"/>
+  <!-- ухмылка -->
+  <path d="M24 45c3 4.5 13 4.5 16 0l-2.5 6-5.5 3.2-5.5-3.2z" fill="#0C0716"/>
+</svg>

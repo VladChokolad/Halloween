@@ -1,0 +1,1221 @@
+/* ============================================================
+   «Тыквоголос» — дизайн-система «Неоновый склеп»
+   Источники: 03-Айдентика §4 (палитра), §5 (шрифты), §7 (компоненты),
+   §8 (motion), §12 (a11y). Mobile-first 320px → 4K, без сборки.
+   ============================================================ */
+
+/* ---------- 1. Токены (03 §4) ---------- */
+:root {
+    /* база 60/30/10 */
+    --bg: #0C0716;
+    /* Склеп — фон */
+    --surface: #1A1029;
+    /* Ночной бархат — карточки, панели */
+    --surface-2: #251638;
+    /* Гробовая пыль — ховеры, инпуты */
+    --border: #3A2A55;
+    /* Паутина — обводки 1px */
+    --text: #F4EEE6;
+    /* Кость — основной текст (15.8:1) */
+    --text-muted: #A79BC0;
+    /* Туман — второстепенный (6.9:1), ≥13px */
+
+    /* акценты 10% */
+    --primary: #FF7518;
+    /* Тыква */
+    --primary-glow: #FF9E4A;
+    /* Свеча — ховеры */
+    --accent: #8B5CF6;
+    /* Колдовство — ссылки, фокус */
+    --toxic: #C6FF3D;
+    /* Токсичная слизь — выбрано/успех */
+
+    /* семантика */
+    --success: #4ADE80;
+    --warning: #FBBF24;
+    --danger: #F43F5E;
+    --info: #38BDF8;
+
+    /* цвета номинаций (чипы, прогресс, диаграммы) */
+    --cat-scary: #8B5CF6;
+    --cat-funny: #FF7518;
+    --cat-original: #C6FF3D;
+    --cat-group: #38BDF8;
+    --cat-grandprix: #FBBF24;
+
+    /* бренд-градиент — только фоны/hero, не текст */
+    --grad-brand: linear-gradient(135deg, #8B5CF6 0%, #FF7518 100%);
+
+    /* форма и свечение */
+    --radius-card: 20px;
+    --radius-btn: 14px;
+    --radius-photo: 16px;
+    --glow-primary: 0 0 24px rgba(255, 117, 24, .45);
+    --glow-toxic: 0 0 24px rgba(198, 255, 61, .35);
+
+    /* шрифты (03 §5) + системные фолбэки для file:// */
+    --font-display: 'Rubik Wet Paint', 'Arial Black', sans-serif;
+    --font-ui: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    --font-hand: 'Caveat', 'Segoe Script', 'Comic Sans MS', cursive;
+
+    --maxw: 720px;
+    --tap: 44px;
+    /* минимальная тап-зона */
+}
+
+/* ---------- 2. База ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--text);
+    font: 400 16px/1.5 var(--font-ui);
+}
+
+/* уголки-паутины (03 §6, итоговая прозрачность ≤0.08) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        url("../assets/pattern-web.svg") top left / 230px 230px no-repeat,
+        url("../assets/pattern-web.svg") bottom right / 280px 280px no-repeat;
+}
+
+/* мягкая фиолетовая виньетка сверху */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(120% 80% at 50% 0%, rgba(139, 92, 246, .13), transparent 60%);
+}
+
+header,
+main,
+footer,
+nav {
+    position: relative;
+    z-index: 1;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
+
+img,
+svg {
+    display: block;
+}
+
+/* фокус виден всегда (03 §12) */
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.skip-link {
+    position: absolute;
+    left: 8px;
+    top: -56px;
+    z-index: 100;
+    padding: 12px 16px;
+    background: var(--primary);
+    color: #0C0716;
+    font: 800 14px/1 var(--font-ui);
+    border-radius: 0 0 10px 10px;
+    text-decoration: none;
+    transition: top .2s;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+.noscript {
+    margin: 24px 16px;
+    padding: 16px;
+    border: 1px solid var(--danger);
+    border-radius: 12px;
+    background: rgba(244, 63, 94, .08);
+    color: var(--text);
+}
+
+/* ---------- 3. Шапка ---------- */
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.brand-logo {
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0 0 10px rgba(255, 117, 24, .55));
+}
+
+/* вордмарк: дисплейный шрифт только ≥20px (03 §5) */
+.brand-name {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 20px;
+    letter-spacing: .02em;
+    text-shadow: 0 0 12px rgba(255, 117, 24, .5);
+}
+
+/* бейдж состояния (03 §7): НЕ НАЧАТО muted · АКТИВНО toxic · ПАУЗА warning · ЗАВЕРШЕНО violet */
+.state-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--tap);
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font: 800 12px/1 var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    white-space: nowrap;
+}
+
+.state-badge.st-active {
+    color: var(--toxic);
+    border-color: rgba(198, 255, 61, .4);
+}
+
+.state-badge.st-active::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--toxic);
+    box-shadow: 0 0 8px var(--toxic);
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.state-badge.st-paused {
+    color: var(--warning);
+}
+
+.state-badge.st-finished {
+    color: #A78BFA;
+}
+
+/* ---------- 4. Прогресс: 5 тыкв ---------- */
+.progress {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    padding: 2px 16px 0;
+}
+
+.pumpkin {
+    width: 36px;
+    height: 36px;
+    font-size: 26px;
+    line-height: 36px;
+    text-align: center;
+    filter: grayscale(1) brightness(.45);
+    transition: filter .25s;
+}
+
+.pumpkin.done {
+    filter: none;
+    text-shadow: 0 0 12px rgba(255, 117, 24, .6);
+}
+
+.pumpkin.current {
+    filter: none;
+    animation: pumpkin-pulse 1.6s ease-in-out infinite;
+}
+
+/* ---------- 5. Основная сетка ---------- */
+main {
+    flex: 1;
+    width: 100%;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 20px 16px 32px;
+}
+
+.view {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* hero: Wet Paint ≥34px, не в абзацах (03 §5) */
+.hero {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(34px, 9vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    text-shadow: 0 0 24px rgba(255, 117, 24, .3);
+}
+
+.hero:focus {
+    outline: none;
+}
+
+.lead {
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+.muted {
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+.step-count {
+    font: 800 13px/1 var(--font-ui);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.step-count b {
+    color: var(--text);
+    font-size: 15px;
+}
+
+.step-view {
+    --cat-color: var(--primary);
+}
+
+.step-view[data-cat="SCARY"] {
+    --cat-color: var(--cat-scary);
+}
+
+.step-view[data-cat="FUNNY"] {
+    --cat-color: var(--cat-funny);
+}
+
+.step-view[data-cat="ORIGINAL"] {
+    --cat-color: var(--cat-original);
+}
+
+.step-view[data-cat="GROUP"] {
+    --cat-color: var(--cat-group);
+}
+
+.step-view[data-cat="GRANDPRIX"] {
+    --cat-color: var(--cat-grandprix);
+}
+
+.step-view .hero {
+    color: var(--cat-color);
+    text-shadow: 0 0 24px rgba(0, 0, 0, 0);
+}
+
+.group-head {
+    margin-top: 8px;
+    font: 800 13px/1.2 var(--font-ui);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ---------- 6. Карточка кандидата (03 §7) ----------
+   Фиксированная сетка: ровно 3 в ряд на десктопе и планшете,
+   2 — на мобильных (<640px), 1 — на узких (<380px). */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+@media (max-width: 639.98px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 379.98px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 280px;
+    overflow: hidden;
+    min-height: var(--tap);
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    color: var(--text);
+    font: 600 15px/1.3 var(--font-ui);
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .2s, border-color .2s, box-shadow .2s, filter .2s, opacity .2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+}
+
+.card:active {
+    transform: translateY(0);
+}
+
+.card-photo {
+    position: relative;
+    display: block;
+    flex: 0 0 auto;
+    height: 52%;
+    border-radius: var(--radius-photo);
+    background: var(--surface-2);
+    color: var(--border);
+    /* силуэт-призрак */
+    overflow: hidden;
+}
+
+.card-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-photo svg {
+    position: absolute;
+    left: 10%;
+    top: 12%;
+    width: 80%;
+    height: 80%;
+}
+
+.card-num {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #0C0716;
+    font: 800 13px/28px var(--font-ui);
+    text-align: center;
+    box-shadow: 0 0 10px rgba(255, 117, 24, .5);
+}
+
+.card-name {
+    font-weight: 600;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-desc {
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-tag {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font: 800 11px/1 var(--font-ui);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.card-tag.tag-group {
+    color: var(--info);
+    border-color: rgba(56, 189, 248, .4);
+}
+
+/* выбрано: НЕ только цветом — рамка + glow + чек-бейдж + подпись (03 §12) */
+.card.selected {
+    border: 2px solid var(--toxic);
+    box-shadow: var(--glow-toxic);
+    transform: scale(1.02);
+}
+
+.card-check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--toxic);
+    color: #0C0716;
+    font: 800 15px/28px var(--font-ui);
+    text-align: center;
+    box-shadow: 0 0 12px rgba(198, 255, 61, .6);
+}
+
+/* заблокирован: выбран в другой номинации (FR-V-05) */
+.card.locked {
+    cursor: not-allowed;
+    filter: grayscale(1);
+    opacity: .45;
+}
+
+.card.locked:hover {
+    transform: none;
+    border-color: var(--border);
+}
+
+.card-lock {
+    position: absolute;
+    top: 46px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 92%;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--warning);
+    font: 800 11px/1.2 var(--font-ui);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* пружинка выбора 200 мс (03 §8) */
+.card.pop {
+    animation: card-pop .2s ease-out;
+}
+
+/* ---------- 7. Пустая номинация ---------- */
+.empty-note {
+    padding: 40px 16px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-card);
+    background: rgba(26, 16, 41, .5);
+    text-align: center;
+}
+
+.empty-emoji {
+    font-size: 44px;
+    line-height: 1;
+}
+
+.empty-note p {
+    margin-top: 10px;
+    color: var(--text-muted);
+}
+
+/* ---------- 8. Кнопки (03 §7) ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 12px 20px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-btn);
+    font: 800 16px/1.2 var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background .2s, border-color .2s, box-shadow .2s, transform .1s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #0C0716;
+    /* 8.2:1 на тыкве */
+    box-shadow: var(--glow-primary);
+}
+
+.btn-primary:hover {
+    background: var(--primary-glow);
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent);
+    background: rgba(139, 92, 246, .08);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.btn-ghost:hover {
+    color: var(--text);
+}
+
+.btn[disabled] {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* дыхание glow у кнопки подтверждения (03 §8) */
+.btn-confirm {
+    animation: breathe 3s ease-in-out infinite;
+}
+
+/* ---------- 9. Навигация шага ---------- */
+.step-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 8px;
+}
+
+.step-nav .btn {
+    flex: 1 1 auto;
+}
+
+.step-nav .btn-ghost {
+    flex: 0 1 auto;
+}
+
+/* ---------- 10. Экраны состояний / успех ---------- */
+.state-view {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 18px;
+    min-height: 50vh;
+    padding-top: 6vh;
+}
+
+.state-art {
+    font-size: 64px;
+    line-height: 1;
+    filter: drop-shadow(0 0 18px rgba(139, 92, 246, .5));
+}
+
+.state-view .btn {
+    min-width: min(280px, 100%);
+}
+
+.success-view {
+    align-items: center;
+    text-align: center;
+}
+
+.voters-counter {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-glow);
+}
+
+/* ---------- 11. Подтверждение ---------- */
+.sum-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sum-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 52px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.sum-cat {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 104px;
+    color: var(--cat, var(--text-muted));
+    font: 800 12px/1 var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.sum-cat::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--cat, var(--border));
+}
+
+.sum-val {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-align: right;
+    font-weight: 600;
+}
+
+.sum-thumb {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--border);
+    overflow: hidden;
+}
+
+.sum-thumb svg {
+    width: 100%;
+    height: 100%;
+}
+
+.err {
+    padding: 12px 16px;
+    border: 1px solid rgba(244, 63, 94, .4);
+    border-radius: 12px;
+    background: rgba(244, 63, 94, .08);
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.confirm-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+/* honeypot: физически скрыт, не фокусируется (FR-V-08) */
+.honeypot {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* ---------- 12. Результаты (results.html) ---------- */
+.results-head {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.results-sub {
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.result-cat {
+    margin-bottom: 32px;
+}
+
+.result-cat h2 {
+    font: 800 24px/1.2 var(--font-ui);
+    color: var(--cat-color);
+    margin-bottom: 4px;
+}
+
+.result-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    letter-spacing: .02em;
+    margin-bottom: 14px;
+}
+
+.result-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.result-row {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 4px 12px;
+    align-items: center;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.place {
+    font-size: 22px;
+    text-align: center;
+}
+
+.r-name {
+    font-weight: 600;
+}
+
+.bar {
+    grid-column: 1 / -1;
+    position: relative;
+    height: 28px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--w, 0%);
+    background: var(--cat-color);
+    opacity: .8;
+    border-radius: 999px;
+    transition: width .7s ease-out;
+}
+
+.bar-val {
+    position: absolute;
+    right: 12px;
+    top: 0;
+    font: 800 13px/28px var(--font-ui);
+    color: var(--text);
+}
+
+.rip {
+    padding: 24px 16px;
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    color: var(--text-muted);
+    text-align: center;
+    font: 600 20px/1.3 var(--font-hand);
+}
+
+/* ---------- 13. Подвал ---------- */
+.site-footer {
+    text-align: center;
+    padding: 20px 16px 28px;
+    border-top: 1px solid var(--border);
+}
+
+.footer-slogan {
+    display: block;
+    font: 600 24px/1.2 var(--font-hand);
+    color: var(--primary-glow);
+}
+
+.footer-meta {
+    display: block;
+    margin-top: 6px;
+    font: 400 13px/1.4 var(--font-ui);
+    letter-spacing: .02em;
+    color: var(--text-muted);
+}
+
+/* ---------- 14. Демо-панель (только прототип — удалить при переносе в Django) ---------- */
+.demo-panel {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    z-index: 70;
+    width: min(320px, calc(100vw - 24px));
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--danger);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .6);
+}
+
+.demo-panel h2 {
+    font: 800 14px/1.2 var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--warning);
+}
+
+.demo-note {
+    margin: 6px 0 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-muted);
+}
+
+.demo-state {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.demo-state output {
+    color: var(--toxic);
+}
+
+.demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.demo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.demo-btn {
+    min-height: var(--tap);
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: 600 13px/1.2 var(--font-ui);
+    cursor: pointer;
+}
+
+.demo-btn:hover {
+    border-color: var(--accent);
+}
+
+.demo-btn[aria-pressed="true"] {
+    border-color: var(--toxic);
+    color: var(--toxic);
+}
+
+/* ---------- 15. Ключевые кадры (03 §8) ---------- */
+@keyframes pumpkin-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        filter: none;
+    }
+
+    50% {
+        transform: scale(1.18);
+        filter: drop-shadow(0 0 10px rgba(255, 117, 24, .8));
+    }
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: .5;
+        transform: scale(.8);
+    }
+}
+
+@keyframes card-pop {
+    0% {
+        transform: scale(1);
+    }
+
+    45% {
+        transform: scale(1.06);
+    }
+
+    100% {
+        transform: scale(1.02);
+    }
+}
+
+@keyframes breathe {
+
+    0%,
+    100% {
+        box-shadow: 0 0 12px rgba(255, 117, 24, .3);
+    }
+
+    50% {
+        box-shadow: 0 0 28px rgba(255, 117, 24, .6);
+    }
+}
+
+@keyframes flicker {
+    0% {
+        opacity: 1;
+    }
+
+    8% {
+        opacity: .35;
+    }
+
+    16% {
+        opacity: 1;
+    }
+
+    24% {
+        opacity: .25;
+    }
+
+    34% {
+        opacity: 1;
+    }
+
+    52% {
+        opacity: .8;
+    }
+
+    60%,
+    100% {
+        opacity: 1;
+    }
+}
+
+.flicker {
+    animation: flicker .6s linear 1;
+}
+
+/* переход шага: слайд + фейд, 250 мс */
+@keyframes slide-out-left {
+    to {
+        opacity: 0;
+        transform: translateX(-28px);
+    }
+}
+
+@keyframes slide-out-right {
+    to {
+        opacity: 0;
+        transform: translateX(28px);
+    }
+}
+
+@keyframes slide-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(28px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slide-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(-28px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-out-left {
+    animation: slide-out-left .22s ease forwards;
+}
+
+.slide-out-right {
+    animation: slide-out-right .22s ease forwards;
+}
+
+.slide-in-left {
+    animation: slide-in-left .25s ease both;
+}
+
+.slide-in-right {
+    animation: slide-in-right .25s ease both;
+}
+
+/* успех: мыши/призрак/конфетти ≤2.5 с */
+#fx-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.fx-bat {
+    position: absolute;
+    top: var(--y, 20vh);
+    left: -12vw;
+    font-size: calc(22px * var(--s, 1));
+    opacity: 0;
+    animation: bat-fly var(--d, 1.4s) var(--delay, 0s) ease-in-out forwards;
+}
+
+@keyframes bat-fly {
+    0% {
+        transform: translateX(0) translateY(0) rotate(-6deg);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    50% {
+        transform: translateX(55vw) translateY(-6vh) rotate(6deg);
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(122vw) translateY(3vh) rotate(-4deg);
+        opacity: 0;
+    }
+}
+
+.fx-ghost {
+    position: absolute;
+    left: 50%;
+    bottom: -80px;
+    font-size: 76px;
+    animation: ghost-rise 2s ease-out forwards;
+}
+
+@keyframes ghost-rise {
+    0% {
+        transform: translate(-50%, 0) scale(.6);
+        opacity: 0;
+    }
+
+    30% {
+        opacity: .95;
+    }
+
+    100% {
+        transform: translate(-50%, -58vh) scale(1.1);
+        opacity: 0;
+    }
+}
+
+.fx-confetti {
+    position: absolute;
+    top: -6vh;
+    left: var(--x, 50vw);
+    font-size: calc(17px * var(--s, 1));
+    opacity: 0;
+    animation: confetti-fall var(--d, 1.6s) var(--delay, 0s) linear forwards;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+
+    8% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(116vh) rotate(340deg);
+        opacity: 0;
+    }
+}
+
+/* ---------- 16. Десктоп (03 §5: 3–4 колонки, контент ≤720px) ---------- */
+@media (min-width: 1200px) {
+    main {
+        max-width: 960px;
+    }
+
+    .hero {
+        font-size: 44px;
+    }
+}
+
+/* ---------- 17. prefers-reduced-motion (03 §8, §12) ---------- */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .pumpkin.current {
+        animation: none;
+    }
+
+    .btn-confirm {
+        animation: none;
+    }
+}

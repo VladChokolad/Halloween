@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Тыквоголос — админка{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="admin">
+    <header class="admin-header">
+        <h1>🎃 Тыквоголос</h1>
+        <nav class="admin-nav">
+            <a href="{% url 'admin_dashboard' %}">Дашборд</a>
+            <a href="{% url 'admin_participants' %}">Участники</a>
+            <a href="{% url 'admin_groups' %}">Группы</a>
+            <a href="{% url 'admin_results' %}">Результаты</a>
+            <a href="{% url 'admin_export_page' %}">Экспорт</a>
+            <a href="{% url 'admin_danger' %}">Опасная зона</a>
+            <a href="{% url 'admin_qr' %}">QR</a>
+            <a href="/django-admin/" title="Аварийный бэкдор Django-admin (superuser)">django-admin ↗</a>
+            <a href="{% url 'admin_logout' %}">Выйти</a>
+        </nav>
+        <span class="muted">{{ request.session.admin_login }}</span>
+    </header>
+
+    <main class="admin-main">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

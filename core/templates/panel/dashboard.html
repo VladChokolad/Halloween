@@ -1,0 +1,131 @@
+{% extends "panel/base_admin.html" %}
+
+{% block title %}Тыквоголос — дашборд{% endblock %}
+
+{% block content %}
+<h2 class="section">Дашборд организатора 🧙</h2>
+
+<div>
+    <span class="badge-state st-{{ state.state }}" id="state-badge">{{ state.state }}</span>
+    {% for t in transitions %}
+    <button type="button" class="btn btn-secondary" id="trigger-state-{{ t.to }}">{{ t.label }}</button>
+    {% endfor %}
+</div>
+<p class="muted">Переход требует контрольной фразы; сервер проверяет её повторно (ТЗ §13.3).</p>
+
+<div class="stat-grid">
+    <div class="stat">
+        <div class="num" id="voters-total">{{ voters_total }}</div>
+        <div class="lbl">проголосовавших (автообновление 30 с)</div>
+    </div>
+    <div class="stat">
+        <div class="num">{{ votes_total }}</div>
+        <div class="lbl">голосов всего</div>
+    </div>
+    <div class="stat">
+        <div class="num">{{ participants_active }}/{{ participants_total }}</div>
+        <div class="lbl">участников активных</div>
+    </div>
+    <div class="stat">
+        <div class="num">{{ groups_active }}/{{ groups_total }}</div>
+        <div class="lbl">групп активных</div>
+    </div>
+</div>
+
+<h3>Аномалии 👁️</h3>
+{% if anomalies.count %}
+<p>Голосов на ip_hash ≥ {{ anomalies.threshold }} — подозрительные источники (в БД только хэш, Т2):</p>
+<table class="admin-table">
+    <tr>
+        <th>ip_hash</th>
+        <th>голосов</th>
+    </tr>
+    {% for a in anomalies.items %}
+    <tr>
+        <td><code>{{ a.ip_hash }}</code></td>
+        <td>{{ a.votes }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p class="muted">Аномалий не обнаружено (порог: голосов на один ip_hash ≥ {{ anomalies.threshold }}).</p>
+{% endif %}
+
+<h3>Последние действия</h3>
+<table class="admin-table">
+    <tr>
+        <th>когда</th>
+        <th>действие</th>
+        <th>детали</th>
+    </tr>
+    {% for log in recent_log %}
+    <tr>
+        <td>{{ log.created_at|date:"d.m H:i" }}</td>
+        <td>{{ log.action }}</td>
+        <td><code>{{ log.details }}</code></td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3" class="muted">Пока пусто</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p class="muted">Аварийный бэкдор /django-admin/ — superuser {{ superuser_email }} (создаётся createsuperuser).</p>
+
+{% for t in transitions %}
+{# include строго в одну строку: лексер Django не распознаёт многострочные теги #}
+{% include "panel/confirm_modal.html" with modal_id="confirm-state-"|add:t.to trigger_id="trigger-state-"|add:t.to form_action="/admin/state/" modal_title=t.label phrase=t.phrase modal_fields=t.fields submit_label="Подтвердить переход" %}
+{% endfor %}
+
+{# последствия переходов: списки по целевому состоянию #}
+{% if transitions %}
+<script>
+    /* последствия для каждого модала перехода (§8.1) */
+    var CONSEQUENCES = {
+        "ACTIVE": [
+            "Гости увидят экраны голосования (шаги 1–5).",
+            "Каждый гость сможет проголосовать один раз.",
+            "Черновики гостей восстановятся с места паузы (E3)."
+        ],
+        "PAUSED": [
+            "Голосование приостановится: POST голосов вернёт 409 paused.",
+            "Черновики гостей сохранятся в localStorage (E3).",
+            "Повторное включение — фразой «ПРОДОЛЖИТЬ»."
+        ],
+        "FINISHED": [
+            "Голосование завершится НАВСЕГДА (E8) — прямой выход только через опасную зону.",
+            "Станет доступен переключатель публикации результатов (E10).",
+            "Гости увидят экран «Котёл запечатан 🔮»."
+        ]
+    };
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for t in transitions %}
+        (function () {
+            var modal = document.getElementById('confirm-state-{{ t.to }}');
+            if (!modal) return;
+            var ul = modal.querySelector('.consequences');
+            ul.innerHTML = (CONSEQUENCES['{{ t.to }}'] || []).map(function (c) {
+                return '<li>' + c + '</li>';
+            }).join('');
+        })();
+        {% endfor %}
+    });
+</script>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    /* автообновление счётчика каждые 30 с через /api/v1/stats (§8.3) */
+    (function () {
+        function refresh() {
+            fetch('/api/v1/stats').then(function (r) { return r.json(); }).then(function (s) {
+                var el = document.getElementById('voters-total');
+                if (el && typeof s.voters_total === 'number') el.textContent = s.voters_total;
+            }).catch(function () { /* сеть моргнула — попробуем в следующий раз */ });
+        }
+        window.setInterval(refresh, 30000);
+    })();
+</script>
+{% endblock %}

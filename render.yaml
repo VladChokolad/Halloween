@@ -1,0 +1,45 @@
+# Render Blueprint «Тыквоголос» (04-Инфраструктура-и-деплой §6.3).
+# Деплой: Render → New → Blueprint → указать репозиторий; секреты вводятся
+# вручную (sync: false) из .env.example.
+services:
+  - type: web
+    name: tykvogolos
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: ./scripts/build.sh
+    startCommand: gunicorn tykvogolos.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 90 --access-logfile - --error-logfile -
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        sync: false          # 3.12.x — дублирует файл PYTHON_VERSION в корне
+      - key: SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: "0"
+      - key: ALLOWED_HOSTS
+        sync: false          # например, tykvogolos.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false          # например, https://tykvogolos.onrender.com
+      - key: TIME_ZONE
+        value: Europe/Moscow
+      - key: DATABASE_URL
+        sync: false          # Neon pooled: ...-pooler...neon.tech/neondb?sslmode=require
+      - key: ADMIN_LOGIN
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: VOTER_COOKIE_DAYS
+        value: "30"
+      - key: SOFT_IP_LIMIT
+        value: "0"
+      - key: VOTE_RATE_LIMIT
+        value: "10"
+      - key: PHOTO_MAX_MB
+        value: "5"
+      - key: LOGIN_MAX_ATTEMPTS
+        value: "5"
+      - key: LOGIN_LOCK_MINUTES
+        value: "10"

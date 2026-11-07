@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- все вьюхи (состояния, шаги 1–5, подтверждение, успех) рендерит js/vote.js -->
+<div id="view-root"></div>
+{% endblock %}
+
+{% block scripts %}
+<!-- server-rendered bootstrap: замена data.js/state.js (план бэкенда §7.3) -->
+{{ bootstrap|json_script:"tg-bootstrap" }}
+<script src="{% static 'js/fx.js' %}" defer></script>
+<script src="{% static 'js/vote.js' %}" defer></script>
+{% endblock %}

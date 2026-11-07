@@ -1,0 +1,59 @@
+{# confirm_modal.html — общий partial подтверждения крупных действий (план бэкенда §8.1): #}
+{# заголовок, список последствий, поле контрольной фразы; кнопка disabled, пока введённая #}
+{# фраза не совпадёт с ожидаемой; сервер повторно валидирует фразу (ТЗ §13.3). #}
+{# ВНИМАНИЕ: комментарии Django и любые теги обязаны быть в ОДНУ строку — лексер Django #}
+{# не распознаёт многострочные конструкции и выводит их сырым текстом на страницу. #}
+{# Параметры: modal_id — id обёртки (уникальный на странице); trigger_id — id кнопки; #}
+{# form_action — URL POST (внутри csrf_token + hidden поля modal_fields); modal_title; #}
+{# consequences — список строк последствий; phrase — ожидаемая контрольная фраза; #}
+{# modal_fields — опц. словарь скрытых полей; submit_label — опц. надпись кнопки. #}
+<div class="modal-backdrop" id="{{ modal_id }}" role="dialog" aria-modal="true" aria-labelledby="{{ modal_id }}-title">
+    <div class="modal">
+        <h3 id="{{ modal_id }}-title">{{ modal_title }}</h3>
+        <ul class="consequences">
+            {% for c in consequences %}<li>{{ c }}</li>{% endfor %}
+        </ul>
+        <form method="post" action="{{ form_action }}">
+            {% csrf_token %}
+            {% for k, v in modal_fields.items %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+            <label for="{{ modal_id }}-phrase">Контрольная фраза: введите <b>«{{ phrase }}»</b></label>
+            <input class="phrase-input" type="text" name="phrase" id="{{ modal_id }}-phrase" autocomplete="off"
+                spellcheck="false">
+            <div class="modal-actions">
+                <button type="button" class="btn" data-close="{{ modal_id }}">Отмена</button>
+                <button type="submit" class="btn btn-danger" disabled>{{ submit_label|default:"Подтвердить" }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var modal = document.getElementById('{{ modal_id }}');
+        var trigger = document.getElementById('{{ trigger_id }}');
+        if (!modal || !trigger) return;
+        var expected = '{{ phrase|escapejs }}';
+        var phraseInput = modal.querySelector('.phrase-input');
+        var submitBtn = modal.querySelector('button[type=submit]');
+
+        trigger.addEventListener('click', function (e) {
+            e.preventDefault();
+            modal.classList.add('open');
+            phraseInput.value = '';
+            submitBtn.disabled = true;
+            phraseInput.focus();
+        });
+
+        modal.querySelector('[data-close]').addEventListener('click', function () {
+            modal.classList.remove('open');
+        });
+
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) modal.classList.remove('open');
+        });
+
+        phraseInput.addEventListener('input', function () {
+            submitBtn.disabled = phraseInput.value.trim().toUpperCase() !== expected.toUpperCase();
+        });
+    })();
+</script>

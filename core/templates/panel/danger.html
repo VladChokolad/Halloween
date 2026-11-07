@@ -1,0 +1,40 @@
+{% extends "panel/base_admin.html" %}
+
+{% block title %}Тыквоголос — опасная зона{% endblock %}
+
+{% block content %}
+<h2 class="section">Опасная зона ☠️</h2>
+
+<div class="danger-zone">
+    <h2>Сброс голосов</h2>
+    <p>
+        Удалит все голоса ({{ votes_total }} записей), обнулит отметки «проголосовал»
+        ({{ voters_total }} гостей), вернёт состояние в НЕ НАЧАТО.
+        <b>Справочники ({{ participants_total }} участников, {{ groups_total }} групп) останутся целы.</b>
+    </p>
+    <p class="danger-export-note">
+        Правило №1 шпаргалки: сначала экспорт!
+        <a class="btn btn-sm" href="{% url 'admin_export' 'votes' %}">⬇ Скачать экспорт голосов</a>
+        <a class="btn btn-sm" href="{% url 'admin_export' 'results.json' %}">⬇ results.json</a>
+    </p>
+    <button type="button" class="btn btn-danger" id="trigger-reset-votes">Сбросить голоса</button>
+</div>
+
+<div class="danger-zone">
+    <h2>Полный сброс</h2>
+    <p>
+        Удалит <b>ВСЁ</b>: голоса, гостей, участников, группы и журнал действий.
+        База останется пустой, состояние — НЕ НАЧАТО. Использовать только для
+        генеральной репетиции.
+    </p>
+    <p class="danger-export-note">
+        Сначала экспорт — после полного сброса данные восстановить нельзя:
+        <a class="btn btn-sm" href="{% url 'admin_export_page' %}">⬇ Все файлы экспорта</a>
+    </p>
+    <button type="button" class="btn btn-danger" id="trigger-full-reset">ПОЛНЫЙ СБРОС</button>
+</div>
+
+{# include строго в одну строку: лексер Django не распознаёт многострочные теги #}
+{% include "panel/confirm_modal.html" with modal_id="confirm-reset-votes" trigger_id="trigger-reset-votes" form_action="/admin/danger/action/" modal_title="Сбросить голоса" phrase=phrase_reset_votes consequences=reset_consequences modal_fields=reset_fields submit_label="Сбросить голоса" %}
+{% include "panel/confirm_modal.html" with modal_id="confirm-full-reset" trigger_id="trigger-full-reset" form_action="/admin/danger/action/" modal_title="ПОЛНЫЙ СБРОС базы" phrase=phrase_full_reset consequences=full_consequences modal_fields=full_fields submit_label="Выполнить ПОЛНЫЙ СБРОС" %}
+{% endblock %}

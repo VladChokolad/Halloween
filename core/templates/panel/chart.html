@@ -1,0 +1,87 @@
+{% extends "panel/base_admin.html" %}
+{% load static %}
+
+{% block title %}Тыквоголос — {{ name }} (экран){% endblock %}
+
+{% block extra_head %}
+<style>
+    /* полноэкранный режим проектора: скрыть шапку админки */
+    body.chart-fullscreen .admin-header {
+        display: none;
+    }
+
+    body.chart-fullscreen .admin-main {
+        max-width: none;
+        padding: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chart-stage">
+    <div style="width: 100%; max-width: 1100px;">
+        <h2
+            style="text-align: center; font-size: 40px; color: {{ color }}; font-family: 'Rubik Wet Paint', 'Arial Black', sans-serif;">
+            {{ name }}
+        </h2>
+        <canvas id="chart-canvas" aria-label="Диаграмма: {{ name }}" role="img"></canvas>
+        {% if not chartjs %}
+        {# graceful-фолбэк без Chart.js: CSS-список, без ошибок консоли #}
+        <ol style="font-size: 28px; text-align: center; list-style: none; padding: 0;">
+            {% for item in chart_items %}
+            <li style="margin: 14px 0;">{{ item.label }} — <strong>{{ item.votes }}</strong></li>
+            {% endfor %}
+        </ol>
+        {% endif %}
+        <p style="text-align: center; font-size: 22px; margin-top: 20px;">🎃 Бал нежити</p>
+    </div>
+</div>
+<p class="chart-hint">Нажмите <kbd>F11</kbd> для полноэкранного режима браузера · <a href="{% url 'admin_results' %}">←
+        к результатам</a></p>
+{% endblock %}
+
+{% block scripts %}
+{{ labels|json_script:"chart-labels" }}
+{{ data|json_script:"chart-data" }}
+{% if chartjs %}
+<script src="{% static 'vendor/chart.umd.min.js' %}"></script>
+<script>
+    /* данные из view — labels/data/color; Chart.js 4 горизонтальные бары */
+    (function () {
+        var LABELS = JSON.parse(document.getElementById('chart-labels').textContent);
+        var DATA = JSON.parse(document.getElementById('chart-data').textContent);
+        var COLOR = "{{ color|escapejs }}";
+        var canvas = document.getElementById('chart-canvas');
+        if (!canvas || typeof Chart === 'undefined') return; /* graceful-фолбэк */
+        new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: LABELS,
+                datasets: [{
+                    data: DATA,
+                    backgroundColor: COLOR,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#A99BC9', font: { size: 18 } }, grid: { color: '#3A2A5E' } },
+                    y: { ticks: { color: '#F5F0FF', font: { size: 22 } }, grid: { display: false } }
+                }
+            }
+        });
+        /* «⛶» — Fullscreen API по клавише F */
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') {
+                if (document.fullscreenElement) document.exitFullscreen();
+                else document.documentElement.requestFullscreen();
+            }
+        });
+    })();
+</script>
+{% endif %}
+{% endblock %}
